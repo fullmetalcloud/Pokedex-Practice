@@ -10,11 +10,46 @@
 	if	(!$conn) {
 		die("Connection	failed:	"	.	mysqli_connect_error());
 	}	
-	echo	"Connected	successfully";	
+	echo	"Connected	successfully";
+	$type1Array = array();	
+	$sql = "SELECT name FROM Types";
+	$result = mysqli_query($conn, $sql);
+	if (mysqli_num_rows($result) > 0) {
+		while($row = mysqli_fetch_row($result)) {
+			$type1Array[] = $row[0];
+		}
+	} 
+	else {
+		echo "0 results for Types";
+	}
+	echo "</select>";
 ?>
 <html>
 <head>
 <title>AddName</title>
+<script>
+function check(str) {
+    if (str == "") {
+        document.getElementById("txtHint").innerHTML = "";
+        return;
+    } else { 
+        if (window.XMLHttpRequest) {
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest();
+        } else {
+            // code for IE6, IE5
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+            }
+        };
+        xmlhttp.open("GET","changeDropdownType.php?q="+str,true);
+        xmlhttp.send();
+    }
+}
+</script>
 </head>
 <body style='background-color:lightsteelblue'>
 <form action='Check_Add_Name.php' method='POST'>
@@ -28,44 +63,23 @@ Pokemon Name:
 Type 1:
 <br>
 <?php
-$sql = "SELECT name FROM Types";
-$result = mysqli_query($conn, $sql);
-if (mysqli_num_rows($result) > 0) {
-	echo "<select name = 'type1'>";
-	while($row = mysqli_fetch_row($result)) {
-	    echo "<option value ='" . $row[0] . "'>" . $row[0] . "</option>";
+	if (count($type1Array) > 0) {
+			echo "<select name='type1' onchange='check(this.value)'>";
+			for ($x = 0; $x < count($type1Array); $x++) {
+			    echo "<option value ='" . $type1Array[$x] . "'>" . $type1Array[$x] . "</option>";
+			}
 	}
-} 
-else {
-	echo "0 results";
-}
-echo "</select>";
-
+	else {
+		echo "0 results";
+	}
+	echo "</select>";
 ?>
 <br><br>
 Type 2:
-<br>
-<?php
-$sql = "SELECT name FROM Types";
-$result = mysqli_query($conn, $sql);
-if (mysqli_num_rows($result) > 0) {
-	echo "<select name = 'type2'>";
-	while($row = mysqli_fetch_row($result)) {
-
-	    echo "<option value ='" . $row[0] . "'>" . $row[0] . "</option>";
-	}
-} 
-else {
-	echo "0 results";
-}
-echo "</select>";
-?>
-<br><br>
+<div id="txtHint"><b>Something should change here...</b></div>
 <input type=submit name='submitName' value='submit' />
 </form>
 <hr>
 </body>
 </html>
-<?php
-	mysqli_close($conn);
-?>	
+	
